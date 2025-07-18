@@ -1,7 +1,7 @@
 ﻿movement_utilitarian = {
 	category = movement_category_ideological
 	
-	ideology = ideology_utilitarian_millian
+	ideology = ideology_utilitarian_movement
 	character_ideologies = {
 		ideology_utilitarian_leader
 	}
@@ -80,7 +80,47 @@
 	}
 	
 	pop_support_weight = {
-		value = 1
+		if = {
+			limit = {
+				exists = scope:political_movement
+				scope:political_movement ?= {
+						OR = {
+							is_being_suppressed = yes
+							is_being_bolstered = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					scope:political_movement = {
+						is_being_suppressed = yes
+					}
+				}
+				add = {
+					value = suppression_base_value
+					multiply = {
+						value = -0.5
+						add = owner.modifier:country_suppression_attraction_factor
+					}
+					desc = "concept_suppressed"
+				}
+			}
+			else = {
+				add = {
+					value = bolstering_base_value
+					multiply = {
+						value = 0.5
+						add = owner.modifier:country_bolster_attraction_factor
+					}
+					desc = "concept_bolstered"
+				}
+			}
+		}
+
+		add = {
+			value = 1
+			desc = "POP_BASE_SUPPORT"
+		}
 		
 		if = {
 			limit = {
@@ -266,7 +306,7 @@
 movement_orleanist = {
 	category = movement_category_ideological
 	
-	ideology = ideology_orleanist
+	ideology = ideology_orleanist_movement
 	character_ideologies = {
 		ideology_orleanist
 	}
@@ -355,6 +395,43 @@ movement_orleanist = {
 	}
 	
 	pop_support_weight = {
+		if = {
+			limit = {
+				exists = scope:political_movement
+				scope:political_movement ?= {
+						OR = {
+							is_being_suppressed = yes
+							is_being_bolstered = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					scope:political_movement = {
+						is_being_suppressed = yes
+					}
+				}
+				add = {
+					value = suppression_base_value
+					multiply = {
+						value = -0.5
+						add = owner.modifier:country_suppression_attraction_factor
+					}
+					desc = "concept_suppressed"
+				}
+			}
+			else = {
+				add = {
+					value = bolstering_base_value
+					multiply = {
+						value = 0.5
+						add = owner.modifier:country_bolster_attraction_factor
+					}
+					desc = "concept_bolstered"
+				}
+			}
+		}
+
 		add = {
 			value = 3
 			desc = "POP_BASE_SUPPORT"
@@ -499,7 +576,7 @@ movement_orleanist = {
 movement_bonapartist = {
 	category = movement_category_ideological
 	
-	ideology = ideology_bonapartist
+	ideology = ideology_bonapartist_movement
 	character_ideologies = {
 		ideology_bonapartist
 	}
@@ -590,6 +667,43 @@ movement_bonapartist = {
 	}
 	
 	pop_support_weight = {
+		if = {
+			limit = {
+				exists = scope:political_movement
+				scope:political_movement ?= {
+						OR = {
+							is_being_suppressed = yes
+							is_being_bolstered = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					scope:political_movement = {
+						is_being_suppressed = yes
+					}
+				}
+				add = {
+					value = suppression_base_value
+					multiply = {
+						value = -0.5
+						add = owner.modifier:country_suppression_attraction_factor
+					}
+					desc = "concept_suppressed"
+				}
+			}
+			else = {
+				add = {
+					value = bolstering_base_value
+					multiply = {
+						value = 0.5
+						add = owner.modifier:country_bolster_attraction_factor
+					}
+					desc = "concept_bolstered"
+				}
+			}
+		}
+
 		add = {
 			value = 5
 			desc = "POP_BASE_SUPPORT"
@@ -746,7 +860,7 @@ movement_bonapartist = {
 movement_legitimist = {
 	category = movement_category_ideological
 	
-	ideology = ideology_legitimist
+	ideology = ideology_legitimist_movement
 	character_ideologies = {
 		ideology_legitimist
 	}
@@ -837,6 +951,43 @@ movement_legitimist = {
 	}
 
 	pop_support_weight = {
+		if = {
+			limit = {
+				exists = scope:political_movement
+				scope:political_movement ?= {
+						OR = {
+							is_being_suppressed = yes
+							is_being_bolstered = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					scope:political_movement = {
+						is_being_suppressed = yes
+					}
+				}
+				add = {
+					value = suppression_base_value
+					multiply = {
+						value = -0.5
+						add = owner.modifier:country_suppression_attraction_factor
+					}
+					desc = "concept_suppressed"
+				}
+			}
+			else = {
+				add = {
+					value = bolstering_base_value
+					multiply = {
+						value = 0.5
+						add = owner.modifier:country_bolster_attraction_factor
+					}
+					desc = "concept_bolstered"
+				}
+			}
+		}
+
 		add = {
 			desc = "URBAN_STATE" # Increases support in rural states, decreases in urban
 			value = 0.5

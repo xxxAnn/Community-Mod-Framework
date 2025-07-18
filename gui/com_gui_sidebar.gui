@@ -145,7 +145,6 @@ types com_sidebar_overwrite {
         ### LABEL BUTTONS
         flowcontainer = {
             name = "tutorial_highlight_sidebar"
-            direction = vertical
             resizeparent = yes
             margin = { 0 5 }
             margin_right = -8 #margin to trim the hover area for the labels
@@ -322,7 +321,7 @@ types com_sidebar_overwrite {
                 sidebar_label_button = {
                     position = { -100 @buildings_position }
                     blockoverride "onclick" {
-                        onclick = "[InformationPanelBar.OpenCompactBuildingBrowserPanelCycleFilters( GetPlayer.Self, '|is_urban|is_rural|is_development' )]"
+                        onclick = "[InformationPanelBar.OpenCompactBuildingBrowserPanelCycleFilters( GetPlayer.Self, '|is_development|is_rural|is_urban' )]"
                         input_action = "open_buildings"
                     }
                 }
@@ -346,7 +345,7 @@ types com_sidebar_overwrite {
                         blockoverride "button_selected" {
                             visible = "[InformationPanelBar.IsPanelOpen('compact_building_browser')]"
                         }
-                        onclick = "[InformationPanelBar.OpenCompactBuildingBrowserPanelCycleFilters( GetPlayer.Self, '|is_urban|is_rural|is_development' )]"
+                        onclick = "[InformationPanelBar.OpenCompactBuildingBrowserPanelCycleFilters( GetPlayer.Self, '|is_development|is_rural|is_urban' )]"
                     }
                 }
                 sidebar_tooltip_area = {
@@ -359,7 +358,7 @@ types com_sidebar_overwrite {
                 sidebar_label_button = {
                     position = { -100 @trade_position }
                     blockoverride "onclick" {
-                        onclick = "[InformationPanelBar.OpenMarketPanelCycleTabs(AccessPlayer.AccessFirstMarket, 'market', 'default|trade_routes|food_security|states')]"
+                        onclick = "[InformationPanelBar.OpenMarketPanelCycleTabs(AccessPlayer.AccessFirstMarket.Self, 'market', 'default|world_market_trade|food_security|states')]"
                         input_action = "open_market"
                     }
                 }
@@ -383,7 +382,7 @@ types com_sidebar_overwrite {
                         blockoverride "button_selected" {
                             visible = "[InformationPanelBar.IsPanelOpen('market')]"
                         }
-                        onclick = "[InformationPanelBar.OpenMarketPanelCycleTabs(AccessPlayer.AccessFirstMarket, 'market', 'default|trade_routes|food_security|states')]"
+                        onclick = "[InformationPanelBar.OpenMarketPanelCycleTabs(AccessPlayer.AccessFirstMarket.Self, 'market', 'default|world_market_trade|food_security|states')]"
                     }
                 }
                 sidebar_tooltip_area = {
@@ -547,7 +546,7 @@ types com_sidebar_overwrite {
                     enabled = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
                     position = { -100 @companies_position }
                     blockoverride "onclick" {
-                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('companies', 'default|potential_companies')]"
+                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('companies', 'default|ranking')]"
                         input_action = "open_companies"
                     }
                 }
@@ -572,7 +571,7 @@ types com_sidebar_overwrite {
                         blockoverride "button_selected" {
                             visible = "[InformationPanelBar.IsPanelOpen('companies')]"
                         }
-                        onclick = "[InformationPanelBar.OpenPanel('companies')]"
+                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('companies', 'default|ranking')]"
                     }
                 }
                 sidebar_tooltip_area_small = {
@@ -586,7 +585,7 @@ types com_sidebar_overwrite {
                     enabled = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
                     position = { -100 @society_position }
                     blockoverride "onclick" {
-                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('society', 'default|cultures|religions')]"
+                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('society', 'default|cultures|religions|classes')]"
                         input_action = "open_society"
                     }
                 }
@@ -611,7 +610,7 @@ types com_sidebar_overwrite {
                         blockoverride "button_selected" {
                             visible = "[InformationPanelBar.IsPanelOpen('society')]"
                         }
-                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('society', 'default|cultures|religions')]"
+                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('society', 'default|cultures|religions|classes')]"
                     }
                 }
                 sidebar_tooltip_area_small = {
@@ -664,7 +663,7 @@ types com_sidebar_overwrite {
                     enabled = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
                     position = { -100 @journal_position }
                     blockoverride "onclick" {
-                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('journal', 'default|inactive_journal_entries')]"
+                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('journal', 'default|inactive_journal_entries|nation_formation')]"
                         input_action = "open_journal"
                     }
                 }
@@ -689,7 +688,7 @@ types com_sidebar_overwrite {
                         blockoverride "button_selected" {
                             visible = "[InformationPanelBar.IsPanelOpen('journal')]"
                         }
-                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('journal', 'default|inactive_journal_entries')]"
+                        onclick = "[InformationPanelBar.OpenPanelCycleTabs('journal', 'default|inactive_journal_entries|nation_formation')]"
                     }
                     textbox = {
                         parentanchor = right|top
@@ -757,9 +756,6 @@ types com_sidebar_overwrite {
                     tooltip = "MAP_LIST_TOOLTIP"
                     input_action = map_list
                 }
-
-
-
             }
         }
     }
@@ -768,6 +764,7 @@ types com_sidebar_overwrite {
     # It is referenced above in the changes
     # base game type
     type custom_sidebar = flowcontainer {
+        datacontext = "[GetMetaPlayer.GetPlayedOrObservedCountry]"
         position = { 0 @maplist_position }
         parentanchor = top|left
         direction = vertical
@@ -775,24 +772,28 @@ types com_sidebar_overwrite {
 
         # Don't show in observer mode
         # or when there are no buttons
-        visible = "[And3(
-            GetMetaPlayer.GetPlayedOrObservedCountry.IsValid,
-            Not(IsObserver),
-            Or(
-                Not(IsDataModelEmpty(GetGlobalList('custom_button_list'))),
-                Not(IsDataModelEmpty(GetGlobalList('custom_button_list_flag')))
-            )
-        )]"
+        visible = "[Country.IsValid]"
 
         # Close custom panels when a base game panel is opened
         # Same behavior as base game
-        state = {
-            trigger_when = "[InformationPanelBar.IsAnyPanelOpen]"
-            on_finish = "[GetVariableSystem.Clear('com_open_window')]"
+        widget = {
+            state = {
+                trigger_when = "[InformationPanelBar.IsAnyPanelOpen]"
+                on_finish = "[GetVariableSystem.Clear('com_open_window')]"
+            }
+        }
+        # Close custom panels when ledger panel is opened
+        # Same behavior as base game
+        widget = {
+            state = {
+                trigger_when = "[MapListPanelManager.IsVisible]"
+                on_finish = "[GetVariableSystem.Clear('com_open_window')]"
+            }
         }
 
         #widget needed to prevent you from clicking on the map
         widget = {
+            visible = "[GetScriptedGui('com_sidebar_has_visible_items').IsShown(GuiScope.SetRoot(Country.MakeScope).End)]"
             using = clickthrough_blocker
             position = { 0 0 }
             size = { 100% 60 }
@@ -804,172 +805,156 @@ types com_sidebar_overwrite {
                 frame = 1
                 scale = 0.5
             }
+        }
 
-            # Close custom panels when ledger panel is opened
-            # Same behavior as base game
-            state = {
-                trigger_when = "[MapListPanelManager.IsVisible]"
-                on_finish = "[GetVariableSystem.Clear('com_open_window')]"
+        widget = {
+            size = { 0 0 }
+            alpha = 0
+            flowcontainer = {
+                datamodel = "[GetGlobalList('custom_button_list_flag')]" # Get registered custom buttons
+                item = {
+                    widget = {
+                        widget = {
+                            state = {
+                                trigger_when = "[GetScriptedGui(Scope.GetFlagName).IsShown(GuiScope.SetRoot(Country.MakeScope).End)]"
+                                on_finish = "[GetScriptedGui('com_sidebar_add_visible_item').Execute(GuiScope.AddScope('flag', GetIdeology(Scope.GetFlagName).MakeScope).End)]"
+                            }
+                        }
+                        widget = {
+                            state = {
+                                trigger_when = "[Not(GetScriptedGui(Scope.GetFlagName).IsShown(GuiScope.SetRoot(Country.MakeScope).End))]"
+                                on_finish = "[GetScriptedGui('com_sidebar_remove_hidden_item').Execute(GuiScope.AddScope('flag', GetIdeology(Scope.GetFlagName).MakeScope).End)]"
+                            }
+                        }
+                    }
+                }
+            }
+            flowcontainer = {
+                datamodel = "[Country.MakeScope.GetList('custom_button_list_flag')]" # Get registered custom buttons
+                item = {
+                    widget = {
+                        datacontext = "[GetIdeology(Scope.GetFlagName)]"
+                        widget = {
+                            visible = "[GetScriptedGui(Scope.GetFlagName).IsShown(GuiScope.SetRoot(Country.MakeScope).End)]"
+                            state = {
+                                trigger_on_create = yes
+                                name = _show
+                                on_finish = "[GetScriptedGui('com_sidebar_add_visible_country_item').Execute(GuiScope
+                                    .SetRoot(Country.MakeScope)
+                                    .AddScope('flag', Ideology.MakeScope)
+                                    .End
+                                )]"
+                            }
+                        }
+                        widget = {
+                            visible = "[Not(GetScriptedGui(Scope.GetFlagName).IsShown(GuiScope.SetRoot(Country.MakeScope).End))]"
+                            state = {
+                                trigger_on_create = yes
+                                name = _show
+                                on_finish = "[GetScriptedGui('com_sidebar_remove_hidden_country_item').Execute(GuiScope
+                                    .SetRoot(Country.MakeScope)
+                                    .AddScope('flag', Ideology.MakeScope)
+                                    .End
+                                )]"
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        # New logic
         flowcontainer = {
+            name = tutorial_highlight_com_sidebar
             direction = vertical
             datamodel = "[GetGlobalList('custom_button_list_flag')]" # Get registered custom buttons
             position = { 0 -100 }
 
             item = {
-                container = {
-                    datacontext = "[GetIdeology(Scope.GetFlagName)]"
-                    datacontext = "[GetScriptedGui(Scope.GetFlagName)]"
-                    enabled = "[ScriptedGui.IsValid(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-
-                    widget = {
-                        parentanchor = bottom|left
-                        icon = {
-                            parentanchor = bottom|left
-                            position = { 0 20 }
-                            texture = "gfx/interface/main_hud/sidebar_skin_bg_1.dds"
-                            framesize = { 100 100 }
-                            size = { 100 100 }
-                            scale = 0.42
-                            frame = 1
-                            mirror = vertical
-                        }
-                    }
-
-                    widget = {
-                        size = { 50 40 }
-                        background = {
-                            texture = "gfx/interface/main_hud/sidebar_skin_bg_4.dds"
-                        }
-                    }
-
-                    sidebar_label_button_small = {
-                        position = { -100 0 }
-                        blockoverride "onclick" {
-                            enabled = "[ScriptedGui.IsValid(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-                            onclick = "[GetVariableSystem.Set('com_open_window', Scope.GetFlagName)]"
-                            onclick = "[ScriptedGui.Execute(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-                        }
-                    }
-
-                    sidebar_label_text_small = {
-                        position = { -100 0 }
-                        raw_text = "[Ideology.GetDesc]"
-                    }
-
-                    widget = {
-                        size = { 50 40 }
-                        using = clickthrough_blocker
-                        using = sidebar_button_size_small
-                        using = selected_sidepanel_animation_small
-                        blockoverride "selected_visibility" {
-                            visible = "[GetVariableSystem.HasValue('com_open_window', Scope.GetFlagName)]"
-                        }
-                        sidepanel_button_small = {
-                            position = { -4 0 }
-                            blockoverride "icon" {
-                                scale = 0.7
-                                texture = "[Ideology.GetTexture]"
-                            }
-                            blockoverride "button_selected" {
-                                visible = "[GetVariableSystem.HasValue('com_open_window', Scope.GetFlagName)]"
-                            }
-                            enabled = "[ScriptedGui.IsValid(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-                            onclick = "[GetVariableSystem.Set('com_open_window', Scope.GetFlagName)]"
-                            onclick = "[ScriptedGui.Execute(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-                        }
-                    }
-
-                    sidebar_tooltip_area_small = {
-                        position = { 0 0 }
-                        # Only show tooltip when there is one defined
-                        visible = "[Not(ObjectsEqual(Localize(Concatenate(Scope.GetFlagName, '_tooltip')), Concatenate(Scope.GetFlagName, '_tooltip')))]"
-                        tooltip = "[Localize(Concatenate(Scope.GetFlagName, '_tooltip'))]"
-                    }
-                }
+                com_sidebar_button = {}
             }
         }
 
-        # Old logic
         flowcontainer = {
+            name = tutorial_highlight_com_sidebar_country
             direction = vertical
-            datamodel = "[GetGlobalList('custom_button_list')]" # Get registered custom buttons
+            datamodel = "[Country.MakeScope.GetList('custom_button_list_flag')]" # Get registered custom buttons
             position = { 0 -100 }
 
             item = {
-                container = {
-                    datacontext = "[GetScriptedGui(Scope.GetIdeology.GetNameNoFormatting)]"
-                    enabled = "[ScriptedGui.IsValid(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-
-                    widget = {
-                        parentanchor = bottom|left
-                        icon = {
-                            parentanchor = bottom|left
-                            position = { 0 20 }
-                            texture = "gfx/interface/main_hud/sidebar_skin_bg_1.dds"
-                            framesize = { 100 100 }
-                            size = { 100 100 }
-                            scale = 0.42
-                            frame = 1
-                            mirror = vertical
-                        }
-                    }
-
-                    widget = {
-                        size = { 50 40 }
-                        background = {
-                            texture = "gfx/interface/main_hud/sidebar_skin_bg_4.dds"
-                        }
-                    }
-
-                    sidebar_label_button_small = {
-                        position = { -100 0 }
-                        blockoverride "onclick" {
-                            enabled = "[ScriptedGui.IsValid(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-                            onclick = "[GetVariableSystem.Set('com_open_window', Scope.GetIdeology.GetNameNoFormatting)]"
-                            onclick = "[ScriptedGui.Execute(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-                        }
-                    }
-
-                    sidebar_label_text_small = {
-                        position = { -100 0 }
-                        raw_text = "[Scope.GetIdeology.GetDesc]"
-                    }
-
-                    widget = {
-                        size = { 50 40 }
-                        using = clickthrough_blocker
-                        using = sidebar_button_size_small
-                        using = selected_sidepanel_animation_small
-                        blockoverride "selected_visibility" {
-                            visible = "[GetVariableSystem.HasValue('com_open_window', Scope.GetIdeology.GetNameNoFormatting)]"
-                        }
-                        sidepanel_button_small = {
-                            position = { -4 0 }
-                            blockoverride "icon" {
-                                scale = 0.7
-                                texture = "[Scope.GetIdeology.GetTexture]"
-                            }
-                            blockoverride "button_selected" {
-                                visible = "[GetVariableSystem.HasValue('com_open_window', Scope.GetIdeology.GetNameNoFormatting)]"
-                            }
-                            enabled = "[ScriptedGui.IsValid(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-                            onclick = "[GetVariableSystem.Set('com_open_window', Scope.GetIdeology.GetNameNoFormatting)]"
-                            onclick = "[ScriptedGui.Execute(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-                        }
-                    }
-
-                    sidebar_tooltip_area_small = {
-                        position = { 0 0 }
-                        # Only show tooltip when there is one defined
-                        visible = "[Not(ObjectsEqual(Localize(Concatenate(Scope.GetIdeology.GetNameNoFormatting, '_tooltip')), Concatenate(Scope.GetIdeology.GetNameNoFormatting, '_tooltip')))]"
-                        tooltip = "[Localize(Concatenate(Scope.GetIdeology.GetNameNoFormatting, '_tooltip'))]"
-                    }
-                }
+                com_sidebar_button = {}
             }
+        }
+    }
+
+    type com_sidebar_button = container {
+        datacontext = "[GetIdeology(Scope.GetFlagName)]"
+        datacontext = "[GetScriptedGui(Scope.GetFlagName)]"
+        enabled = "[ScriptedGui.IsValid(GuiScope.SetRoot(Country.MakeScope).End)]"
+        visible = "[ScriptedGui.IsShown(GuiScope.SetRoot(Country.MakeScope).End)]"
+
+        widget = {
+            parentanchor = bottom|left
+            icon = {
+                parentanchor = bottom|left
+                position = { 0 20 }
+                texture = "gfx/interface/main_hud/sidebar_skin_bg_1.dds"
+                framesize = { 100 100 }
+                size = { 100 100 }
+                scale = 0.42
+                frame = 1
+                mirror = vertical
+            }
+        }
+
+        widget = {
+            size = { 50 40 }
+            background = {
+                texture = "gfx/interface/main_hud/sidebar_skin_bg_4.dds"
+            }
+        }
+
+        sidebar_label_button_small = {
+            position = { -100 0 }
+            blockoverride "onclick" {
+                enabled = "[ScriptedGui.IsValid(GuiScope.SetRoot(Country.MakeScope).End)]"
+                onclick = "[GetVariableSystem.Set('com_open_window', Scope.GetFlagName)]"
+                onclick = "[ScriptedGui.Execute(GuiScope.SetRoot(Country.MakeScope).End)]"
+            }
+        }
+
+        sidebar_label_text_small = {
+            position = { -100 0 }
+            raw_text = "[Ideology.GetDesc]"
+        }
+
+        widget = {
+            size = { 50 40 }
+            using = clickthrough_blocker
+            using = sidebar_button_size_small
+            using = selected_sidepanel_animation_small
+            blockoverride "selected_visibility" {
+                visible = "[GetVariableSystem.HasValue('com_open_window', Scope.GetFlagName)]"
+            }
+            sidepanel_button_small = {
+                position = { -4 0 }
+                blockoverride "icon" {
+                    scale = 0.7
+                    texture = "[Ideology.GetTexture]"
+                }
+                blockoverride "button_selected" {
+                    visible = "[GetVariableSystem.HasValue('com_open_window', Scope.GetFlagName)]"
+                }
+                enabled = "[ScriptedGui.IsValid(GuiScope.SetRoot(Country.MakeScope).End)]"
+                onclick = "[GetVariableSystem.Set('com_open_window', Scope.GetFlagName)]"
+                onclick = "[ScriptedGui.Execute(GuiScope.SetRoot(Country.MakeScope).End)]"
+            }
+        }
+
+        sidebar_tooltip_area_small = {
+            position = { 0 0 }
+            # Only show tooltip when there is one defined
+            visible = "[Not(ObjectsEqual(Localize(Concatenate(Scope.GetFlagName, '_tooltip')), Concatenate(Scope.GetFlagName, '_tooltip')))]"
+            tooltip = "[Localize(Concatenate(Scope.GetFlagName, '_tooltip'))]"
         }
     }
 }

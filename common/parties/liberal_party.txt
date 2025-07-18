@@ -60,7 +60,7 @@ liberal_party = {
 						}
 					}
 					NOT = {
-						has_modifier = usfp_second_party_system_modifier
+						has_variable = whigs_party
 					}
 				}
 			}
@@ -334,7 +334,7 @@ liberal_party = {
 						AND = {
 							exists = c:USA
 							THIS = c:USA
-							has_modifier = usfp_second_party_system_modifier
+							has_variable = whigs_party
 						}
 					}
 				}
@@ -387,8 +387,15 @@ liberal_party = {
 	available_for_interest_group = {
 		owner = {
 			country_has_voting_franchise = yes
-			ig:ig_intelligentsia = {
-				is_marginal = no
+			#USFP: Liberal party can exist without Intelligentsia
+			OR = {				
+				ig:ig_intelligentsia = {
+					is_marginal = no
+				}
+				AND = {
+					is_usfp_active = yes
+					usfp_country_is_american = yes
+				}
 			}
 		}
 		leader = { # far right and far left won't join liberal parties
@@ -418,6 +425,7 @@ liberal_party = {
 					OR = {
 						has_modifier = modifier_india_crown_rule
 						has_modifier = modifier_india_company_rule
+						has_modifier = modifier_india_company_rule_upgraded
 					}
 				}
 				OR = {
@@ -438,12 +446,40 @@ liberal_party = {
 						has_ideology = ideology:ideology_radical
 						has_ideology = ideology:ideology_reformer
 						has_ideology = ideology:ideology_market_liberal
+						has_ideology = ideology:ideology_humanitarian
+						has_ideology = ideology:ideology_humanitarian_royalist
 					}
 				}
 			}
 			add = {
-				value = 5
 				desc = "from_liberal_leader"
+				if = {
+					limit = {
+						leader = {
+							has_ideology = ideology:ideology_reformer
+						}
+					}
+					add = 10
+				}
+				if = {
+					limit = {
+						leader = {
+							has_ideology = ideology:ideology_market_liberal
+						}
+					}
+					add = 5
+				}
+				if = {
+					limit = {
+						leader = {
+							OR = {
+								has_ideology = ideology:ideology_republican_leader
+								has_ideology = ideology:ideology_radical
+							}
+						}
+					}
+					add = 3
+				}
 			}
 		}
 		if = { # liberals love liberalism
@@ -475,7 +511,6 @@ liberal_party = {
 						character_is_anti_slavery = yes
 						has_ideology = ideology:ideology_pacifist
 						has_ideology = ideology:ideology_social_democrat
-						has_ideology = ideology:ideology_atheist
 						has_ideology = ideology:ideology_humanitarian
 						has_ideology = ideology:ideology_humanitarian_royalist
 						has_ideology = ideology:ideology_usfp_progressive
@@ -539,6 +574,70 @@ liberal_party = {
 			add = {
 				value = 5
 				desc = "from_jingoist_party_leader"
+			}
+		}
+		# for as long as the Industrialists are not powerful, they'll be more liberal
+		if = {
+			limit = {
+				is_powerful = no
+				OR = {
+					leader = {
+						has_ideology = ideology:ideology_market_liberal
+					}
+					has_ideology = ideology:ideology_laissez_faire
+				}
+			}
+			add = {
+				value = 5
+				desc = "from_capitalism"
+			}
+		}
+		# If conservatives [landowners/church] are strong, Industrialists will stay liberal
+		if = {
+			limit = {
+				NOR = {
+					is_interest_group_type = ig_devout
+					is_interest_group_type = ig_landowners
+				}
+				owner = {
+					OR = {
+						ig:ig_landowners ?= {
+							is_powerful = yes
+						}
+						ig:ig_devout ?= {
+							is_powerful = yes
+						}
+					}
+				}
+				OR = {
+					leader = {
+						has_ideology = ideology:ideology_market_liberal
+					}
+					has_ideology = ideology:ideology_laissez_faire
+				}
+			}
+			add = {
+				desc = "from_powerful_conservatives"
+				if = {
+					limit = {
+						owner = {
+							ig:ig_landowners ?= {
+								is_powerful = yes
+							}
+						}
+					}
+					add = 2
+				}
+				if = {
+					limit = {
+						owner = {
+							ig:ig_devout ?= {
+								is_powerful = yes
+							}
+						}
+					}
+					add = 2
+				}
 			}
 		}
 		if = { # against illiteracy and religious education
@@ -650,7 +749,7 @@ liberal_party = {
 				OR = {
 					has_ideology = ideology:ideology_anti_clerical
 					leader = {
-						has_ideology = ideology:ideology_atheist
+						has_ideology = ideology:ideology_nihilist
 					}
 				}
 				owner = {
@@ -669,7 +768,7 @@ liberal_party = {
 					has_ideology = ideology:ideology_populist
 					leader = {
 						OR = {
-							has_ideology = ideology:ideology_atheist
+							has_ideology = ideology:ideology_nihilist
 							has_ideology = ideology:ideology_republican_leader
 							has_ideology = ideology:ideology_radical
 						}
@@ -792,10 +891,31 @@ liberal_party = {
 				NOT = {
 					has_ideology = ideology:ideology_socialist
 				}
+				owner = {
+					NOT = { has_law = law_type:law_universal_suffrage }
+				}
 			}
 			add = {
-				value = 5
 				desc = "from_early_trade_unions"
+				if = {
+					limit = {
+						owner = {
+							OR = {
+								has_law = law_type:law_landed_voting
+								has_law = law_type:law_wealth_voting
+							}
+						}
+					}
+					add = 10
+				}
+				if = {
+					limit = {
+						owner = {
+							has_law = law_type:law_census_voting
+						}
+					}
+					add = 5
+				}
 			}
 		}
 		# Special weights for ACW
@@ -864,7 +984,7 @@ liberal_party = {
 				scope:number = 3
 			}
 			multiply = {
-				value = 0.25
+				value = 0.05
 				desc = "from_three_prior_members"
 			}
 		}
@@ -873,7 +993,7 @@ liberal_party = {
 				scope:number > 3
 			}
 			multiply = {
-				value = 0.1
+				value = 0.0
 				desc = "from_more_than_three_prior_members"
 			}
 		}
@@ -1064,7 +1184,7 @@ liberal_party = {
 				desc = "from_southern_interests"
 			}
 		}
-		#USFP weights
+		### USFP weights ###
 		if = {
 			limit = {
 				is_usfp_active = yes
@@ -1155,11 +1275,31 @@ liberal_party = {
 			if = {
 				limit = {
 					has_party = no
-					exists = owner.py:free_trade_party
+					exists = owner.py:liberal_party
 				}
 				add = {
 					value = 20
 					desc = "join_existing_party"
+				}
+			}
+			#USFP: Intelligentsia should ALWAYS join the Whigs/Republicans
+			if = {
+				limit = {
+					is_interest_group_type = ig_intelligentsia
+				}
+				add  = {
+					value = 100
+					desc = "from_archetype_party"
+				}
+			}
+			#PB are natural whigs/republicans too
+			if = {
+				limit = {
+					is_interest_group_type = ig_petty_bourgeoisie
+				}
+				add  = {
+					value = 20
+					desc = "from_archetype_party"
 				}
 			}
 		}

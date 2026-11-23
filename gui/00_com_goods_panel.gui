@@ -1,0 +1,33 @@
+types com_goods_panel_overwrites {
+	type consumption_tax_button_toggle = button_icon_round_toggle_action {
+		block "size" {
+			size = { 44 44 }
+		}
+
+		block "tooltip" {
+			tooltip = "[Goods.GetTaxDesc(GetMetaPlayer.GetPlayedOrObservedCountry)]"
+		}
+
+		block "enabled" {
+			enabled = "[And(IsValid( Goods.ToggleTaxation(GetMetaPlayer.GetPlayedOrObservedCountry) ), Not(GetGlobalVariable('com_no_player_consumption_taxes').IsSet))]"
+		}
+
+		blockoverride "on_click" {
+			onclick = "[Execute( Goods.ToggleTaxation(GetPlayer) )]"
+		}
+
+		blockoverride "view_1" {
+			visible = "[Not(GreaterThan_CFixedPoint(Goods.CalcConsumptionTaxAmount(GetPlayer), '(CFixedPoint)0'))]"
+		}
+		blockoverride "view_2" {
+			visible = "[GreaterThan_CFixedPoint(Goods.CalcConsumptionTaxAmount(GetPlayer), '(CFixedPoint)0')]"
+		}
+		blockoverride "icon_1" {
+			texture = "gfx/interface/icons/trade_icons/consumption_tax_not.dds"
+		}
+
+		blockoverride "icon_2" {
+			texture = "gfx/interface/icons/trade_icons/consumption_tax.dds"
+		}
+	}
+}
